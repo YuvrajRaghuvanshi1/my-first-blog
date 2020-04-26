@@ -24,7 +24,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'about' %}">About </a>
               </li>
-              {% if user%}
+              {% if user.is_active%}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'accounts:logout' %}">LogOut </a>
               </li>
@@ -34,29 +34,39 @@
               </li>
               {%endif%}
             </ul>
-              <form class="form-inline">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+              <form class="form-inline" action="{% url 'search' %}" method="GET" value="{{request.GET.q}}">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search by Title" aria-label="Search" name="q" value="{{request.GET.q}}" >
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search" name='submit'>Search</button>
               </form>
-            
-              
-              </div> 
-
-    </nav>
-      
+            </nav>
+     
     <body>
         <div class="container">
             <a href="{% url 'post_new' %}" class="top-menu"><span style=" color: Dodgerblue;"><i class="fas fa-plus fa-3x"></i></span></a>
             <div class="jumbotron">
                 <h1 class="display-4">Yuvraj's Blog</h1>
-                <h3 class="lead">-- Publishing your passions ,your way .</h3>
-                <hr class="my-4">
-                <h3>"Your intuition knows what to write, so get out of the way." Ray Bradbury.</h3>
-            </div>
+                <strong><h2 class="lead">-- Publishing your passions ,your way .</h3></strong>
+                </div>
            
             <div class="content container">
                 <div class="row">
                     <div class="col-md-8">
+                      <div>
+                        {% if submitbutton == 'Search' and request.GET.q != '' %}
+                        {% if results %}
+                        <h1>Results for <b>{{ request.GET.q }}:</b></h1>
+                        <br/><br/>
+                        
+                        {% for result in results %}
+                        
+                              <h2><a href="{% url 'post_detail' pk=result.pk %}">{{ result.title }}</a></h2><br>
+                          </div>
+                       {% endfor %}
+                     
+                      {% else %}
+                        No search results for this query
+                        {% endif %}
+                        {% endif %}
                 {% block content %}
                 {% endblock %}
                 </div>
