@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404, redirect
 from django.utils import timezone
-from .models import Post
-from .forms import PostForm
+from .models import Post,Comment
+from .forms import PostForm,CommentForm
 from django.contrib.auth.decorators import login_required
 
 from django.views.generic import (TemplateView,ListView,
@@ -55,6 +55,15 @@ def post_edit(request, pk):
     else:
         return HttpResponse("YOU CANNOT EDIT A POST YOU HAVE NOT WRITTEN!")
 
+@login_required
+def post_delete(request,pk):
+    post = get_object_or_404(Post, pk=pk)
+    item = Post.objects.get(pk=pk)
+    if request.user == item.author:
+        post.delete()
+        return  render(request,'blog/post_list.html') 
+    else:
+        return HttpResponse("YOU CANNOT DELETE A POST YOU HAVE NOT WRITTEN!")    
 
 '''class post_edit(LoginRequiredMixin,UpdateView):
         #login_url = 'accounts/login/'
@@ -88,3 +97,21 @@ def search(request)    :
 
       else:
         return render(request, 'blog/post_list.html')   
+
+
+   
+
+def new_comment(request,pk):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            post=get_object_or_404(Post,pk=pk)
+            comment = form.save(commit=False)
+            comment.created_date = timezone.now()
+            comment.post=post
+            comment.author=request.user
+            comment.save()
+            return redirect('../', pk=post.pk)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/comment_form.html', {'form': form})

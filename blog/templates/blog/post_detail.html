@@ -1,6 +1,7 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+
     <div class="post">
         {% if post.published_date %}
             <div class="date">
@@ -9,7 +10,23 @@
             </div>
         {% endif %}
         <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><i class="fas fa-edit fa-3x"></i></a>
+        <a class="btn btn-default" href="{% url 'post_delete' pk=post.pk %}"><i class="fas fa-trash fa-3x"></i></a>
         <h2>{{ post.title }}</h2>
         <p>{{ post.text|linebreaksbr }}</p>
+    </div>
+    <div class="comment">
+        {%if user.is_active and user.is_authenticated%}
+         Add Comment  : 
+         <a  href="{%url 'comment_form' pk=post.pk %}"> <i class="fas fa-plus-square fa-3x"></i></a><br>
+        {% endif %}
+        {% if post.comments %}
+        {%for comment in post.comments.all%}
+        {{comment.text|linebreaksbr}}<br>
+        {{comment.author}}<br>
+        {{comment.created_date}}<hr>
+        {%endfor%}
+        {%else%}
+         <p>No comments here yet!</p>
+         {%endif%}
     </div>
 {% endblock %}
