@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 # Create your models here.
+from django.urls import reverse
 
 
 
@@ -11,8 +12,10 @@ class Post(models.Model):
     text= models.TextField()
     created_date=models.DateTimeField(default=timezone.now)
     published_date=models.DateTimeField(blank=True,null=True)
-
-
+    
+    def get_absolute_url(self):
+        return reverse('post_list')
+    
     def publish(self):
         self.published_date=timezone.now()
         self.save()
